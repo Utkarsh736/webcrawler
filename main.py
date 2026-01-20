@@ -1,7 +1,9 @@
 import sys
-from crawl import crawl_page
+import asyncio
+from async_crawl import crawl_site_async
 
-def main():
+
+async def main():
     # Argument validation
     if len(sys.argv) < 2:
         print("no website provided")
@@ -14,11 +16,12 @@ def main():
     base_url = sys.argv[1]
     print(f"starting crawl of: {base_url}")
     
-    # Crawl the site
+    # Crawl the site asynchronously
     try:
-        page_data = crawl_page(base_url)
+        # Start with max_concurrency=1, then try 5 or 10
+        page_data = await crawl_site_async(base_url, max_concurrency=5)
         
-        # Filter out failed pages (None values)
+        # Filter successful pages
         successful_pages = {url: data for url, data in page_data.items() if data is not None}
         failed_pages = {url: data for url, data in page_data.items() if data is None}
         
@@ -34,8 +37,8 @@ def main():
                 print(f"  - {url}")
         
         print(f"\nSuccessful Page Details:")
-        for normalized_url, data in successful_pages.items():
-            print(f"\n{normalized_url}")
+        for data in successful_pages.values():
+            print(f"\n{data['url']}")
             print(f"  H1: {data['h1']}")
             print(f"  First paragraph: {data['first_paragraph'][:50]}..." if data['first_paragraph'] else "  First paragraph: (none)")
             print(f"  Outgoing links: {len(data['outgoing_links'])}")
@@ -45,5 +48,7 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
 
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
+
