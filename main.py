@@ -4,22 +4,26 @@ from async_crawl import crawl_site_async
 
 
 async def main():
-    # Argument validation
+    # Parse command-line arguments
     if len(sys.argv) < 2:
-        print("no website provided")
-        sys.exit(1)
-    
-    if len(sys.argv) > 2:
-        print("too many arguments provided")
+        print("Usage: uv run main.py URL [max_concurrency] [max_pages]")
+        print("Example: uv run main.py https://example.com 5 100")
         sys.exit(1)
     
     base_url = sys.argv[1]
+    
+    # Get optional concurrency and max_pages arguments
+    max_concurrency = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+    max_pages = int(sys.argv[3]) if len(sys.argv) > 3 else 100
+    
     print(f"starting crawl of: {base_url}")
+    print(f"max_concurrency: {max_concurrency}")
+    print(f"max_pages: {max_pages}")
+    print()
     
     # Crawl the site asynchronously
     try:
-        # Start with max_concurrency=1, then try 5 or 10
-        page_data = await crawl_site_async(base_url, max_concurrency=5)
+        page_data = await crawl_site_async(base_url, max_concurrency, max_pages)
         
         # Filter successful pages
         successful_pages = {url: data for url, data in page_data.items() if data is not None}
