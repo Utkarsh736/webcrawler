@@ -1,6 +1,7 @@
 import sys
 import asyncio
 from async_crawl import crawl_site_async
+from csv_report import write_csv_report
 
 
 async def main():
@@ -40,13 +41,8 @@ async def main():
             for url in failed_pages.keys():
                 print(f"  - {url}")
         
-        print(f"\nSuccessful Page Details:")
-        for data in successful_pages.values():
-            print(f"\n{data['url']}")
-            print(f"  H1: {data['h1']}")
-            print(f"  First paragraph: {data['first_paragraph'][:50]}..." if data['first_paragraph'] else "  First paragraph: (none)")
-            print(f"  Outgoing links: {len(data['outgoing_links'])}")
-            print(f"  Images: {len(data['image_urls'])}")
+        # Write CSV report
+        write_csv_report(page_data, filename="report.csv")
             
     except Exception as e:
         print(f"Error: {e}")
